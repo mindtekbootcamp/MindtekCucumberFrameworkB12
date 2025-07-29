@@ -1,8 +1,8 @@
 package steps;
 
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
+import io.cucumber.java.Before;
+import io.cucumber.java.After;
 import org.openqa.selenium.WebDriver;
 import utilities.Driver;
 
@@ -23,4 +23,5 @@ public class Hooks {
         driver.quit();
         System.out.println("After Scenario Method");
     }
+
 }

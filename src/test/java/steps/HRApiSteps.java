@@ -1,5 +1,6 @@
 package steps;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -7,6 +8,7 @@ import io.restassured.response.Response;
 import org.junit.Assert;
 import pojos.Department;
 import pojos.Employee;
+import utilities.APIUtils;
 import utilities.ConfigReader;
 import utilities.JDBCUtils;
 import java.sql.SQLException;
@@ -31,7 +33,7 @@ public class HRApiSteps {
     List<String> departmentNames;
 
     @Given("user creates department with post api call with data")
-    public void user_creates_department_with_post_api_call_with_data(io.cucumber.datatable.DataTable dataTable) {
+    public void createDepartment(io.cucumber.datatable.DataTable dataTable) {
         departmentData=dataTable.asMap(String.class, Object.class);
 
         Department department=new Department();
@@ -40,6 +42,7 @@ public class HRApiSteps {
 
         Response response = given().baseUri("http://localhost:3000/api")
                 .and().header("Content-Type", "application/json")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().body(department) // SERIALIZATION | Converting Java Object into Json String
                 .when().post("/departments");
         response.then().log().all();
@@ -70,6 +73,7 @@ public class HRApiSteps {
 
         Response response = given().baseUri("http://localhost:3000/api")
                 .and().header("Content-Type","application/json")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().body(employee)
                 .when().post("/employees");
 
@@ -92,6 +96,7 @@ public class HRApiSteps {
         updatedDepartmentData=dataTable.asMap(String.class,Object.class);
         Response response=given().baseUri("http://localhost:3000/api")
                 .and().header("Content-Type","application/json")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().body("{\n" +
                         "  \"name\": \""+updatedDepartmentData.get("Department name")+"\",\n" +
                         "  \"location_id\": \""+departmentData.get("Location id")+"\"\n" +
@@ -115,6 +120,7 @@ public class HRApiSteps {
     @When("user deletes created department with delete api call")
     public void user_deletes_created_department_with_delete_api_call() {
         Response response=given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().log().all()
                 .when().delete("/departments/"+departmentId);
         response.then().log().all();
@@ -134,6 +140,7 @@ public class HRApiSteps {
     public void user_creates_department_with_post_api_call_with_invalid_url() {
         Response response = given().baseUri("http://localhost:3000/api")
                 .and().header("Content-Type", "application/json")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().body("{\n" +
                         "  \"name\": \"Enrollment\",\n" +
                         "  \"location_id\": 2400\n" +
@@ -150,6 +157,7 @@ public class HRApiSteps {
     @Given("user creates department with post api call with no content type header")
     public void user_creates_department_with_post_api_call_with_no_content_type_header() {
         Response response = given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().body("{\n" +
                         "  \"name\": \"Enrollment\",\n" +
                         "  \"location_id\": 2400\n" +
@@ -179,6 +187,7 @@ public class HRApiSteps {
         }
 
         Response response = given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .header("Content-Type","application/json")
                 .and().body(body)
                 .when().post("/departments");
@@ -192,7 +201,7 @@ public class HRApiSteps {
     }
 
     @Given("user creates department with post api call with invalid data")
-    public void user_creates_department_with_post_api_call_with_invalid_data(io.cucumber.datatable.DataTable dataTable) {
+    public void user_creates_department_with_post_api_call_with_invalid_data(DataTable dataTable) {
         departmentData = dataTable.asMap(String.class,Object.class);
 
         String departmentName=departmentData.get("Department name").toString();
@@ -212,6 +221,7 @@ public class HRApiSteps {
                 "  \"location_id\": \""+locationId+"\"\n" +
                 "}";
         Response response = given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .header("Content-Type","application/json")
                 .and().body(body)
                 .when().post("/departments");
@@ -223,6 +233,7 @@ public class HRApiSteps {
     @Given("user finds non existing department id")
     public void user_finds_non_existing_department_id() {
         Response response=given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .when().get("/departments");
         response.then().log().all();
 
@@ -232,6 +243,7 @@ public class HRApiSteps {
     @When("user deletes non existing department id")
     public void user_deletes_non_existing_department_id() {
         Response response=given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().log().all() // REQUEST details logs/prints
                 .when().delete("/departments/"+nonExistingDepartmentId);
         response.then().log().all(); // RESPONSE details logs/prints
@@ -263,6 +275,7 @@ public class HRApiSteps {
     @When("user gets departments with get api call with {int} limit")
     public void user_gets_departments_with_get_api_call_with_limit(Integer limit) {
         Response response=given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().queryParam("limit",limit)
                 .and().log().all()
                 .when().get("/departments");
@@ -278,6 +291,7 @@ public class HRApiSteps {
     @When("user gets departments with get api call with {string} order")
     public void user_gets_departments_with_get_api_call_with_order(String order) {
         Response response=given().baseUri("http://localhost:3000/api")
+                .and().header("Authorization","Bearer "+ APIUtils.generateToken("HR_Manager"))
                 .and().queryParam("order",order)
                 .and().log().all()
                 .when().get("/departments");
@@ -298,6 +312,15 @@ public class HRApiSteps {
             Collections.sort(expectedDepartmentNames, Collections.reverseOrder());
         }
         Assert.assertTrue(departmentNames.equals(expectedDepartmentNames));
+    }
+
+    @When("user deletes created department with delete api call with {string}")
+    public void user_deletes_created_department_with_delete_api_call_with(String role) {
+        Response response=given().baseUri(ConfigReader.getProperty("HRAPIBaseURL"))
+                .and().header("Authorization","Bearer "+APIUtils.generateToken(role))
+                .when().delete("/departments/"+departmentId);
+        response.then().log().all();
+        statusCode=response.getStatusCode();
     }
 
 }

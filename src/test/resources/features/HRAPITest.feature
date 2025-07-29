@@ -54,7 +54,7 @@ Feature: Validating HR Api calls
       | location_id     |
 
 
-    @regression @createDepartmentWithInvalidFieldValues
+  @regression @createDepartmentWithInvalidFieldValues
   Scenario Outline: Validating create department api call with invalid fields in request body
     Given user creates department with post api call with invalid data
       | Department name | <Department name> |
@@ -74,34 +74,47 @@ Feature: Validating HR Api calls
       | A                               | 2400        | Department name should have at least 3 characters  | 400         |
 
 
-      @regression @deleteDepartmentNegativeTest
-    Scenario: Validating delete department api call with non existing department id
-      Given user finds non existing department id
-      When user deletes non existing department id
-      Then user validates 404 status code
-      And user validates "Department not found" error
+  @regression @deleteDepartmentNegativeTest
+  Scenario: Validating delete department api call with non existing department id
+    Given user finds non existing department id
+    When user deletes non existing department id
+    Then user validates 404 status code
+    And user validates "Department not found" error
 
-    @regression @getDepartmentsWithLimit
-    Scenario Outline: Validating get departments limit query parameter
-      Given user checks if departments exist in database otherwise creates departments
-      When user gets departments with get api call with <limit> limit
-      Then user validates <limit> departments in response
-      Examples:
+  @regression @getDepartmentsWithLimit
+  Scenario Outline: Validating get departments limit query parameter
+    Given user checks if departments exist in database otherwise creates departments
+    When user gets departments with get api call with <limit> limit
+    Then user validates <limit> departments in response
+    Examples:
       | limit |
       | 5     |
       | 1     |
       | 10    |
       | 0     |
 
-      @regression @getDepartmentWithOrder
-    Scenario Outline: Validating get departments order query parameter
-      Given user checks if departments exist in database otherwise creates departments
-      When user gets departments with get api call with "<order>" order
-      Then user validates departments are in "<order>" order in response
-      Examples:
+  @regression @getDepartmentWithOrder
+  Scenario Outline: Validating get departments order query parameter
+    Given user checks if departments exist in database otherwise creates departments
+    When user gets departments with get api call with "<order>" order
+    Then user validates departments are in "<order>" order in response
+    Examples:
       | order |
       | asc   |
       | desc  |
+
+
+  @regression @deleteDepartmentWithHruser
+  Scenario Outline: Validating delete department with different roles
+    Given user creates department with post api call with data
+      | Department name | Admission |
+      | Location id     | 2400      |
+    When user deletes created department with delete api call with "<Role>"
+    Then user validates <Status code> status code
+    Examples:
+      | Role       | Status code |
+      | HR         | 403         |
+      | HR_Manager | 204         |
 
 
 
